@@ -69,39 +69,151 @@
     </form>
 
     <section id="error-btns">
-      <button>Console Log</button>
-      <button>Console Error</button>
-      <button>Console Count</button>
-      <button>Console Warn</button>
-      <button>Console Assert</button>
-      <button>Console Clear</button>
-      <button>Console Dir</button>
-      <button>Console dirxml</button>
-      <button>Console Group Start</button>
-      <button>Console Group End</button>
-      <button>Console Table</button>
-      <button>Start Timer</button>
-      <button>End Timer</button>
-      <button>Console Trace</button>
-      <button>Trigger a Global Error</button>
+      <button onclick="consoleLogButton()">Console Log</button>
+      <button onclick="consoleErrorButton()">Console Error</button>
+      <button onclick="consoleCountButton()">Console Count</button>
+      <button onclick="consoleWarnButton()">Console Warn</button>
+      <button onclick="consoleAssertButton()">Console Assert</button>
+      <button onclick="consoleClearButton()">Console Clear</button>
+      <button onclick="consoleDirButton()">Console Dir</button>
+      <button onclick="consoleDirXMLButton()">Console dirxml</button>
+      <button onclick="consoleGroupButton()">Console Group Start</button>
+      <button onclick="consoleGroupButtonEnd()">Console Group End</button>
+      <button onclick="consoleTableButton()">Console Table</button>
+      <button onclick="consoleTimerStart()">Start Timer</button>
+      <button onclick="consoleTimerEnd()">End Timer</button>
+      <button onclick="consoleTraceButton()">Console Trace</button>
+      <button onclick="consoleGlobalErrorButton()">Trigger a Global Error</button>
     </section>
   </main>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "a3b6fe0e46dd43c4b827dec63c25081c"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+
   <script>
     let form = document.querySelector('form');
+
+    class formEvalError extends Error{
+      constructor(message){
+        super(message);
+        this.name = "formEvalError";
+      }
+    }
+
     form.addEventListener('submit', e => {
       e.preventDefault();
       let output = document.querySelector('output');
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try{
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      }catch(err){
+        console.log("Please enter two valid integers and try again.");
+        console.error(err);
+        try{
+          throw new formEvalError();
+        }catch(err){
+          console.log("Caught custom err formEvalError");
+        }
+      }      
+      
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+    function consoleLogButton(){
+      console.log("Console Log Demo");
+    }
+
+    function consoleErrorButton(){
+      console.error("Console Error Demo");
+    }
+
+    let count = 0;
+    function consoleCountButton(){
+      count++;
+      console.log(`Count Button: ${count}`);
+    }
+
+    function consoleWarnButton(){
+      console.warn("Console Warn Demo");
+    }
+
+    function consoleAssertButton(){
+      console.assert(10 < 5, { a: 10, b: 5, reason: "5 is not greater than 10" });
+    }
+
+    function consoleClearButton(){
+      console.clear();
+    }
+
+    function consoleDirButton(){
+      console.dir(document.head);
+    }
+
+    function consoleDirXMLButton(){
+      console.dirxml(document.head);
+    }
+
+    function consoleGroupButton(){
+      console.group("console.group");
+    }
+
+    function consoleGroupButtonEnd(){
+      console.groupEnd("console.group");
+    }
+
+    function consoleTableButton(){
+      let names = [
+        {
+          first: 'Larry',
+          last: 'David',
+        },
+        {
+          first: 'Rohan',
+          last: 'Madan',
+        },
+        {
+          first: 'Jeff',
+          last: 'Winger',
+        }
+      ];
+      console.table(names);
+    }
+
+    function consoleTimerStart(){
+      console.time();
+    }
+
+    function consoleTimerEnd(){
+      console.timeEnd();
+    }
+
+    function consoleTraceButton(){
+      const one = () => { two(); };
+      const two = () => { three(); };
+      const three = () => { four(); };
+      const four = () => { console.trace(); };
+      one();
+    }
+
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.log("Global error was caught:");
+      console.log("Message:", message);
+      console.error(error);
+      return true; 
+    };
+
+
+
   </script>
 </body>
 
